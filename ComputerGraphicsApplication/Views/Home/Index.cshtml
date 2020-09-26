@@ -1,0 +1,95 @@
+﻿@model ComputerGraphicsApplication.Models.Home.IndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Категорически приветствую!</h1>
+    @if (Model.ImageUrl != null)
+    {
+        <p>Вижу картинку</p>
+        <img class="preview-image" src="@Model.ImageUrl" alt=""/>
+        if (Model.FilteredImageUrl != null)
+        {
+            <img class="preview-image" src="@Model.FilteredImageUrl" alt=""/>
+        }
+        <div class="offset-md-2 col-md-8">
+            @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+            {
+                <input type="hidden" name="filter" value="grayscale">
+                <input type="submit" class="btn btn-success col-md mt-2" value="Применить черно-белый фильтр">
+            }
+            @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+            {
+                <div class="input-group mt-2">
+                    <input type="hidden" name="filter" value="rotate">
+                    <input type="number" class="form-control" name="valueFilter" value="30">
+                    <div class="input-group-append">
+                        <input type="submit" class="btn btn-success" value="Повернуть изображение">
+                    </div>
+                </div>
+            }
+            <button class="btn btn-danger col-md mt-2" onclick="deleteFile()">Удалить картинку</button>
+        </div>
+    }
+    else
+    {
+        <p>Загружай картинку, смелее!</p>
+        <input type="file" class="btn btn-secondary upload-image" value="Выбрать файл" accept=".jpg, .jpeg, .png">
+        <br>
+        <input type="submit" class="btn btn-success mt-2" onclick="sendFile()">
+    }
+</div>
+
+@section Scripts
+{
+    <script>
+        const fileNameCookie = 'fileName';
+    
+        function sendFile() {
+            let image = $(".upload-image");
+            let formData = new FormData;
+
+            formData.append('file', image.prop('files')[0]);
+
+            $.ajax({
+                url: `${document.location.origin}/home/send-files`,
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                success: function (guid) {
+                    setCookie(fileNameCookie, guid)
+                    document.location.reload()
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert(jqXHR.responseText)
+                }
+            })
+        }
+
+        function deleteFile() {
+            $.ajax({
+                url: `${document.location.origin}/home/delete-file`,
+                processData: false,
+                contentType: false,
+                type: 'DELETE',
+                success: function () {
+                    setCookie(fileNameCookie, '')
+                    document.location.reload()
+                }
+            })
+        }
+
+        function setCookie(name, value) {
+            document.cookie = `${name}=${value}`
+        }
+
+        function getCookie(name) {
+            let filterCookie = document.cookie.split(';').filter((item) => item.trim().startsWith(`${name}=`));
+            return filterCookie.length
+             ? filterCookie.map(item => item.trim())[0]
+              : null;
+        }
+    </script>
+}
