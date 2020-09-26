@@ -50,6 +50,12 @@ namespace ComputerGraphicsApplication.Services
             return new FileStream(filePath, FileMode.Open);
         }
 
+        public bool IsExisted(string storagePath, string fileName)
+        {
+            var filePath = Path.Combine(_applicationSettings.GetStorageFolder(), storagePath, fileName);
+            return System.IO.File.Exists(filePath);
+        }
+
         public async Task DeleteAsync(string filePath)
         {
             var fullPath = Path.Combine(_applicationSettings.GetStorageFolder(), filePath);

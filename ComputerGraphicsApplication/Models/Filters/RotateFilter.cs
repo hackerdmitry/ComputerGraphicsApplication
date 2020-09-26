@@ -29,13 +29,13 @@ namespace ComputerGraphicsApplication.Models.Filters
                 {
                     for (var y = -halfHeight; y < halfHeight; y++)
                     {
-                        var xs = (int) (x * Math.Cos(degree) - y * Math.Sin(degree) + halfWidth);
-                        var ys = (int) (x * Math.Sin(degree) + y * Math.Cos(degree) + halfHeight);
+                        var xs = (int) Math.Round(x * Math.Cos(degree) - y * Math.Sin(degree) + halfWidth);
+                        var ys = (int) Math.Round(x * Math.Sin(degree) + y * Math.Cos(degree) + halfHeight);
 
                         if (xs >= 0 && xs < bitmap.Width &&
                             ys >= 0 && ys < bitmap.Height)
                         {
-                            fastResultBitmap.SetPixel(xs, ys, fastBitmap.GetPixel(x + halfWidth, y + halfHeight));
+                            fastResultBitmap.SetPixel(x + halfWidth, y + halfHeight, fastBitmap.GetPixel(xs, ys));
                         }
                     }
                 }

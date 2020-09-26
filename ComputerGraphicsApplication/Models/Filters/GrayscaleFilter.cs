@@ -17,9 +17,9 @@ namespace ComputerGraphicsApplication.Models.Filters
                 {
                     for (var y = 0; y < bitmap.Height; y++)
                     {
-                        var r = fastBitmap.GetPixel(x, y).R * 0.33d;
-                        var g = fastBitmap.GetPixel(x, y).G * 0.5d;
-                        var b = fastBitmap.GetPixel(x, y).B * 0.17d;
+                        var r = fastBitmap.GetPixel(x, y).R * 0.299d;
+                        var g = fastBitmap.GetPixel(x, y).G * 0.587d;
+                        var b = fastBitmap.GetPixel(x, y).B * 0.114d;
                         var grayscale = Normalize(0, (byte) (r + g + b), 255);
 
                         fastResultBitmap.SetPixel(x, y, Color.FromArgb(grayscale, grayscale, grayscale));

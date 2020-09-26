@@ -30,7 +30,8 @@ namespace ComputerGraphicsApplication.Controllers
         private readonly Dictionary<string, Func<string, AbstractFilter>> _filterDictionary = new Dictionary<string, Func<string, AbstractFilter>>
         {
             {"grayscale", value => new GrayscaleFilter()},
-            {"rotate", value => new RotateFilter(value)}
+            {"rotate", value => new RotateFilter(value)},
+            {"sobel", value => new SobelFilter()}
         };
 
         private const string FileNameCookie = "fileName";
@@ -46,22 +47,24 @@ namespace ComputerGraphicsApplication.Controllers
 
         [Route("")]
         [Route("index")]
-        public async Task<ActionResult> Index(string filter = null, string valueFilter = null)
+        public async Task<ActionResult> Index(IndexViewModel indexViewModel)
         {
+            var filter = indexViewModel.Filter;
+            var valueFilter = indexViewModel.ValueFilter;
+
             var abstractFilter = filter != null && _filterDictionary.ContainsKey(filter)
                                      ? _filterDictionary[filter](valueFilter)
                                      : null;
 
             var fileNameCookie = GetCookie(FileNameCookie);
-            var indexViewModel = new IndexViewModel();
-            if (fileNameCookie != null)
+            if (fileNameCookie != null && _fileService.IsExisted(FileService.ImagesStorage, fileNameCookie))
             {
                 indexViewModel.ImageUrl = Path.Combine(_applicationSettings.GetStorageFolder(false), FileService.ImagesStorage, fileNameCookie);
 
                 if (abstractFilter != null)
                 {
                     indexViewModel.FilteredImageUrl = Path.Combine(_applicationSettings.GetStorageFolder(false), FileService.FilterImagesStorage, fileNameCookie);
-                    var fileStream = _fileService.GetStream(FileService.ImagesStorage, fileNameCookie);
+                    await using var fileStream = _fileService.GetStream(FileService.ImagesStorage, fileNameCookie);
                     var image = Image.FromStream(fileStream);
                     var bitmap = new Bitmap(image);
                     await abstractFilter.Apply(bitmap).SaveToStorage(_fileService, fileNameCookie);

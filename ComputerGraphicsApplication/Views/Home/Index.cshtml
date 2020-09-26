@@ -21,9 +21,14 @@
             }
             @using (Html.BeginForm("Index", "Home", FormMethod.Get))
             {
+                <input type="hidden" name="filter" value="sobel">
+                <input type="submit" class="btn btn-success col-md mt-2" value="Применить фильтр Собеля">
+            }
+            @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+            {
                 <div class="input-group mt-2">
                     <input type="hidden" name="filter" value="rotate">
-                    <input type="number" class="form-control" name="valueFilter" value="30">
+                    <input type="number" class="form-control" name="valueFilter" value="@(Model.Filter == "rotate" ? Model.ValueFilter : "30")">
                     <div class="input-group-append">
                         <input type="submit" class="btn btn-success" value="Повернуть изображение">
                     </div>
@@ -63,7 +68,9 @@
                     document.location.reload()
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.responseText)
+                    console.error(errorThrown)
+                    console.log(jqXHR, textStatus)
+                    // alert(jqXHR.responseText)
                 }
             })
         }
