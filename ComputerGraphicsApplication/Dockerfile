@@ -14,3 +14,7 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
 COPY --from=build-env /app/out ./
 ENTRYPOINT ["dotnet", "ComputerGraphicsApplication.dll"]
+
+RUN apt-get update && apt-get -y install sudo
+RUN apt-get -y install libc6-dev
+RUN apt-get -y install libgdiplus
