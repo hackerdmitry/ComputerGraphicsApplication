@@ -11,7 +11,8 @@ namespace ComputerGraphicsApplication.Extensions
     {
         public static async Task SaveToStorage(this Bitmap bitmap,
                                                FileService fileService,
-                                               string fileName)
+                                               string fileName,
+                                               string storageName)
         {
             await using var memStream = new MemoryStream();
             var myImageCodecInfo = GetEncoderInfo("image/png");
@@ -19,7 +20,7 @@ namespace ComputerGraphicsApplication.Extensions
             var myEncoderParameter = new EncoderParameter(myEncoder, 100L);
             var myEncoderParameters = new EncoderParameters(1) {Param = {[0] = myEncoderParameter}};
             bitmap.Save(memStream, myImageCodecInfo, myEncoderParameters);
-            await fileService.SaveStreamToFileAsync(memStream, FileService.FilterImagesStorage, fileName);
+            await fileService.SaveStreamToFileAsync(memStream, storageName, fileName);
         }
 
         private static ImageCodecInfo GetEncoderInfo(string mimeType)

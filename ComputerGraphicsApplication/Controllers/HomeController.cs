@@ -19,6 +19,7 @@ namespace ComputerGraphicsApplication.Controllers
     {
         private readonly FileService _fileService;
         private readonly GuidService _guidService;
+        private readonly ImageService _imageService;
         private readonly ApplicationSettings _applicationSettings;
 
         private readonly HashSet<string> _accessibleContentTypes = new HashSet<string>
@@ -38,10 +39,12 @@ namespace ComputerGraphicsApplication.Controllers
 
         public HomeController(FileService fileService,
                               GuidService guidService,
+                              ImageService imageService,
                               ApplicationSettings applicationSettings)
         {
             _fileService = fileService;
             _guidService = guidService;
+            _imageService = imageService;
             _applicationSettings = applicationSettings;
         }
 
@@ -64,10 +67,9 @@ namespace ComputerGraphicsApplication.Controllers
                 if (abstractFilter != null)
                 {
                     indexViewModel.FilteredImageUrl = Path.Combine(_applicationSettings.GetStorageFolder(false), FileService.FilterImagesStorage, fileNameCookie);
-                    await using var fileStream = _fileService.GetStream(FileService.ImagesStorage, fileNameCookie);
-                    var image = Image.FromStream(fileStream);
-                    var bitmap = new Bitmap(image);
-                    await abstractFilter.Apply(bitmap).SaveToStorage(_fileService, fileNameCookie);
+                    var fileStream = _fileService.GetStream(FileService.ImagesStorage, fileNameCookie);
+                    var bitmap = _imageService.GetBitmapFromStream(fileStream);
+                    await abstractFilter.Apply(bitmap).SaveToStorage(_fileService, fileNameCookie, FileService.FilterImagesStorage);
                 }
             }
 
@@ -85,7 +87,8 @@ namespace ComputerGraphicsApplication.Controllers
 
             var fileName = GetCookie(FileNameCookie) ?? Path.ChangeExtension(_guidService.Create(), Path.GetExtension(file.FileName));
             var uploadFileModel = await UploadFileModel.CreateAsync(file, FileService.ImagesStorage);
-            await _fileService.UploadFileAsync(uploadFileModel, fileName);
+            var image = _imageService.GetImageFromStream(uploadFileModel.Stream);
+            await _imageService.NormalizeImage(image).SaveToStorage(_fileService, fileName, FileService.ImagesStorage);
 
             return fileName;
         }
