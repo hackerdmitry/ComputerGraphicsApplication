@@ -44,7 +44,7 @@ namespace ComputerGraphicsApplication.Services
             var destRect = new Rectangle(0, 0, width, height);
             var destImage = new Bitmap(width, height);
 
-            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+            destImage.SetResolution(image.Width, image.Height);
 
             using (var graphics = Graphics.FromImage(destImage))
             {

@@ -32,7 +32,9 @@ namespace ComputerGraphicsApplication.Controllers
         {
             {"grayscale", value => new GrayscaleFilter()},
             {"rotate", value => new RotateFilter(value)},
-            {"sobel", value => new SobelFilter()}
+            {"sobel", value => new SobelFilter()},
+            {"clear-artefacts", value => new ClearArtefactsFilter()},
+            {"crop", value => new CropFilter(value)}
         };
 
         private const string FileNameCookie = "fileName";

@@ -8,7 +8,7 @@
     @if (Model.ImageUrl != null)
     {
         <p>Вижу картинку</p>
-        <img class="preview-image" src="@Model.ImageUrl" alt=""/>
+        <img class="preview-image" src="@Model.ImageUrl" alt="" onclick="clickToImage(this)"/>
         if (Model.FilteredImageUrl != null)
         {
             <img class="preview-image" src="@Model.FilteredImageUrl" alt=""/>
@@ -27,12 +27,29 @@
             @using (Html.BeginForm("Index", "Home", FormMethod.Get))
             {
                 <div class="input-group mt-2">
+                    <input type="hidden" name="filter" value="crop">
+                    <input type="text" class="form-control crop-text" name="valueFilter" value="@(Model.Filter == "crop"
+                                                                                            ? Model.ValueFilter
+                                                                                            : "125,125,325,325")">
+                    <div class="input-group-append">
+                        <input type="submit" class="btn btn-success" value="Обрезать изображение">
+                    </div>
+                </div>
+            }
+            @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+            {
+                <div class="input-group mt-2">
                     <input type="hidden" name="filter" value="rotate">
                     <input type="number" class="form-control" name="valueFilter" value="@(Model.Filter == "rotate" ? Model.ValueFilter : "30")">
                     <div class="input-group-append">
                         <input type="submit" class="btn btn-success" value="Повернуть изображение">
                     </div>
                 </div>
+            }
+            @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+            {
+                <input type="hidden" name="filter" value="clear-artefacts">
+                <input type="submit" class="btn btn-success col-md mt-2" value="Убрать артефакты">
             }
             <button class="btn btn-danger col-md mt-2" onclick="deleteFile()">Удалить картинку</button>
         </div>
@@ -70,7 +87,6 @@
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error(errorThrown)
                     console.log(jqXHR, textStatus)
-                    // alert(jqXHR.responseText)
                 }
             })
         }
@@ -98,5 +114,22 @@
              ? filterCookie.map(item => item.trim())[0]
               : null;
         }
+
+        $(document).ready(function() {
+            $(".preview-image").on("click", function(event) {
+                let x = event.pageX - this.offsetLeft;
+                let y = event.pageY - this.offsetTop;
+
+                let crop_text = $(".crop-text")[0];
+                let crop_text_val = crop_text.value;
+                let comma_count = (crop_text_val.match(/,/g) || []).length;
+
+                if (comma_count === 0 || comma_count === 3 ) {
+                    crop_text.value = `${x},${y}`
+                } else {
+                    crop_text.value = `${crop_text.value},${x},${y}`
+                }
+            });
+        });
     </script>
 }
